@@ -1,0 +1,10 @@
+# BAMPFA Soup
+
+This is a scraper meant to grab all of the film screening data on bampfa.org that is required by the film archive.
+
+The idea is that scraping it from the frontend, where all of the logic for grouping the data from across the big insane database is already in place. Also, it is a lot faster to develop and run, rather than dealing with php timeouts etc.
+
+To run
+- install dependencies (pything, beautifulsoup, tqdm)
+- run `python3 soup.py`
+- output is put into output.csv
