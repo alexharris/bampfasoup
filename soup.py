@@ -34,14 +34,19 @@ from tqdm import tqdm
 
 f = open('output.csv', "w")   
 
-test_nids = ['239940', '239930', '239946' ,'238464','239764','239782','239789','196477','196491','196492','196494','196495','196508']
-# test_nids = ['239946']
+test_nids = ['240480', '239940', '239930', '239946' ,'238464','239764','239782','239789','196477','196491','196492','196494','196495','196508']
+# test_nids = ['240575'] #one film, multiple showtimes
+# test_nids = ['240480'] #program of shorts
+# test_nids = ['240480', '239940'] #program of shorts
 
 # get the real dataset from nodes.csv
 get_nids = open("nodes.csv", "r")
 nids = csv.reader(get_nids, delimiter=",")
 data = list(nids)
 all_nids = data[0]
+
+f.write('Date | Showtime One | Showtime Two | Film Series | Film Screening Title / Odds and Ends | Film Title | Alternate Title	| Long Description	| Film Note Author | Film Note Author Title	| Legacy Credits | Director | Screenwriter | Cinematographer | Cast/With | Country | Film Year | Film Run Time | Print Source | Permission | In Person Guest | Location')
+f.write('\n')
 
 #test_nids to test, all_nids to run 4 real
 for nid in tqdm(test_nids):
@@ -108,7 +113,7 @@ for nid in tqdm(test_nids):
     for i in get_permissions:
         permissions += i.string + ', '     
 
-    # Permissions 
+    # Guests 
     guests = ''                          
     get_guests = soup.select('.inperson-txt h5')
     for i in get_guests:
@@ -120,44 +125,106 @@ for nid in tqdm(test_nids):
     for i in get_cast:
         cast += i.string.strip() + ' '                                  
 
-
-
-
-
-    # Actors               
-    # print('hello')            
-    # body = soup.select('#node-event-full-group-body')
-    # print(body[0] )
-    # actors = body[0].select('.label-above')[0].find_next_siblings('section')[0].text.strip()
-    # actors = re.sub('\s+',' ',actors)
-   
     # Put it all into output.csv
+    # go through multiple showtimes of a single screening
     for date in dates:
-        f.write(title.string)
-        f.write(' | ')
+        
+        # Write main screening info    
         f.write(date.string)
-        f.write(' | ')
-        f.write(series) 
-        f.write(' | ')
+        f.write(' | ')   
+        f.write('showtime one')
+        f.write(' | ') 
+        f.write('showtime two')
+        f.write(' | ')   
+        f.write(series)
+        f.write(' | ') 
+        f.write(title.string)
+        f.write(' | ')   
+        f.write(title.string)
+        f.write(' | ')   
+        f.write('alt title')        
+        f.write(' | ')  
         f.write(long_desc)
-        f.write(' | ')
+        f.write(' | ')   
+        f.write('film note author')
+        f.write(' | ')  
+        f.write('film note author title')
+        f.write(' | ') 
+        f.write('legacy credits')     
+        f.write(' | ') 
+        f.write(director) 
+        f.write(' | ') 
         f.write(screenwriters) 
-        f.write(' | ')
-        f.write(cinematographers)               
-        f.write(' | ')
-        f.write(director)       
-        f.write(' | ')
-        f.write(country)  
-        f.write(' | ')
-        f.write(location)
-        f.write(' | ')
-        f.write(sources)  
-        f.write(' | ')
-        f.write(permissions)  
-        f.write(' | ')
-        f.write(year) 
-        f.write(' | ')
-        f.write(guests) 
-        f.write(' | ')
-        f.write(cast)                                                                                                               
+        f.write(' | ') 
+        f.write(cinematographers) 
+        f.write(' | ') 
+        f.write(cast)
+        f.write(' | ') 
+        f.write(country)
+        f.write(' | ') 
+        f.write(year)
+        f.write(' | ') 
+        f.write('run time')                                                                                                                                                                                                                                                          
+        f.write(' | ') 
+        f.write(sources)   
+        f.write(' | ') 
+        f.write(permissions)
+        f.write(' | ') 
+        f.write(guests)    
+        f.write(' | ') 
+        f.write(location)                                         
         f.write('\n')
+
+        # Check for program of shorts
+        if(soup.select('.block-views-multiple-films-block > h5')):
+            print('yes')
+            shorts = soup.select('.block-views-multiple-films-block > section')
+            for short in shorts:
+                  
+                # Write main screening info    
+                f.write(date.string)
+                f.write(' | ')   
+                f.write('showtime one')
+                f.write(' | ') 
+                f.write('showtime two')
+                f.write(' | ')   
+                f.write(series)
+                f.write(' | ') 
+                f.write(title.string)
+                f.write(' | ')
+                f.write(short.select('p strong')[0].string)
+                f.write(' | ')                  
+                f.write('alt title')                
+                f.write(' | ')  
+                f.write(long_desc)
+                f.write(' | ')   
+                f.write('film note author')
+                f.write(' | ')  
+                f.write('film note author title')
+                f.write(' | ') 
+                f.write('legacy credits')     
+                f.write(' | ') 
+                f.write(director) 
+                f.write(' | ') 
+                f.write(screenwriters) 
+                f.write(' | ') 
+                f.write(cinematographers) 
+                f.write(' | ') 
+                f.write(cast)
+                f.write(' | ') 
+                f.write(country)
+                f.write(' | ') 
+                f.write(year)
+                f.write(' | ') 
+                f.write('run time')                                                                                                                                                                                                                                                          
+                f.write(' | ') 
+                f.write(sources)   
+                f.write(' | ') 
+                f.write(permissions)
+                f.write(' | ') 
+                f.write(guests)    
+                f.write(' | ') 
+                f.write(location)                                                                                                                                                                  
+                f.write('\n')                
+        else:
+            print('no')         
