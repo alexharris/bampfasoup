@@ -8,17 +8,17 @@
 # Film Note Author
 # Film Note Author Title
 # Legacy Credits
-# Director
+# Director x
 # Screenwriter x
 # Cinematographer x
 # Cast/With x
-# Country
-# Film Year
+# Country x
+# Film Year x
 # Film Run Time
 # Print Source x
-# Permission
-# In Person Guest
-# Location
+# Permission x
+# In Person Guest x
+# Location x
 
 # Some good example screenings
 # Series of shorts: https://bampfa.org/event/ernies-urban-delights
@@ -34,8 +34,8 @@ from tqdm import tqdm
 
 f = open('output.csv', "w")   
 
-# test_nids = ['239940','238464','239764','239782','239789','196477','196491','196492','196494','196495','196508']
-test_nids = ['239940']
+test_nids = ['239940', '239930', '239946' ,'238464','239764','239782','239789','196477','196491','196492','196494','196495','196508']
+# test_nids = ['239946']
 
 # get the real dataset from nodes.csv
 get_nids = open("nodes.csv", "r")
@@ -68,27 +68,68 @@ for nid in tqdm(test_nids):
     else:
         long_desc = 'NOLONGDESCRIPTION'
 
-    # Crew
-    screenwriter = ''
-    cinematographer = ''
-    source = ''
+    # Director                           
+    director = soup.select('.director')
+    director = director[0].text
 
-    film_details = soup.select('.block-views-film-details-block .bampfa-accordion-content *')
-    for i in range(0,len(film_details)):
-        if(film_details[i].string == 'Screenwriter'):
-            for i in film_details[i+1]:
-                screenwriter += i.string.strip()
-        elif(film_details[i].string == 'Cinematographer'):
-            for i in film_details[i+1]:
-                cinematographer += i.string.strip() 
-        elif(film_details[i].string == 'Source'):
-            for i in film_details[i+1]:
-                source += i.string.strip()    
+    # Country                           
+    country = soup.select('.country')
+    country = country[0].text
 
-    # Actors                           
-    body = soup.select('#node-event-full-group-body')
-    actors = body[0].select('.label-above')[0].find_next_siblings('section')[0].text.strip()
-    actors = re.sub('\s+',' ',actors)
+    # Location                           
+    location = soup.select('.location')
+    location = location[0].text    
+
+    # Year                           
+    year = soup.select('.year')
+    year = year[0].text      
+
+    # Screenwriters
+    screenwriters = ''                          
+    get_screenwriters = soup.select('.screenwriters li')
+    for i in get_screenwriters:
+        screenwriters += i.string + ', '
+
+    # Cinematographers 
+    cinematographers = ''                          
+    get_cinematographers = soup.select('.cinematographers li')
+    for i in get_cinematographers:
+        cinematographers += i.string + ', '     
+
+    # Source 
+    sources = ''                          
+    get_sources = soup.select('.source li')
+    for i in get_sources:
+        sources += i.string + ', '  
+
+    # Permissions 
+    permissions = ''                          
+    get_permissions = soup.select('.permissions li')
+    for i in get_permissions:
+        permissions += i.string + ', '     
+
+    # Permissions 
+    guests = ''                          
+    get_guests = soup.select('.inperson-txt h5')
+    for i in get_guests:
+        guests += i.string + ', ' 
+
+    # Cast 
+    cast = ''                          
+    get_cast = soup.select('.cast')
+    for i in get_cast:
+        cast += i.string.strip() + ' '                                  
+
+
+
+
+
+    # Actors               
+    # print('hello')            
+    # body = soup.select('#node-event-full-group-body')
+    # print(body[0] )
+    # actors = body[0].select('.label-above')[0].find_next_siblings('section')[0].text.strip()
+    # actors = re.sub('\s+',' ',actors)
    
     # Put it all into output.csv
     for date in dates:
@@ -100,11 +141,23 @@ for nid in tqdm(test_nids):
         f.write(' | ')
         f.write(long_desc)
         f.write(' | ')
-        f.write(screenwriter)       
+        f.write(screenwriters) 
         f.write(' | ')
-        f.write(cinematographer)   
+        f.write(cinematographers)               
         f.write(' | ')
-        f.write(source)    
+        f.write(director)       
         f.write(' | ')
-        f.write(actors)                                                 
+        f.write(country)  
+        f.write(' | ')
+        f.write(location)
+        f.write(' | ')
+        f.write(sources)  
+        f.write(' | ')
+        f.write(permissions)  
+        f.write(' | ')
+        f.write(year) 
+        f.write(' | ')
+        f.write(guests) 
+        f.write(' | ')
+        f.write(cast)                                                                                                               
         f.write('\n')
