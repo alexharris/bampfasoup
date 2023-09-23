@@ -34,7 +34,7 @@ from tqdm import tqdm
 
 f = open('output.csv', "w")   
 
-test_nids = ['240480', '239940', '239930', '239946' ,'238464','239764','239782','239789','196477','196491','196492','196494','196495','196508']
+test_nids = ['240575', '240480', '239940', '239930', '239946' ,'238464','239764','239782','239789','196477','196491','196492','196494','196495','196508']
 # test_nids = ['240575'] #one film, multiple showtimes
 # test_nids = ['240480'] #program of shorts
 # test_nids = ['240480', '239940'] #program of shorts
@@ -57,6 +57,17 @@ for nid in tqdm(test_nids):
 
     title = soup.css.select('.field-name-title h2')[0]
     dates = soup.find_all("span", "date-display-single")
+    times = soup.find_all("div", "just-time")
+
+    get_times = soup.find_all("div", "just-time")
+    if len(get_times)>0:
+        time1 = get_times[0].string
+        if len(get_times)>1:
+            time2 = get_times[1].string
+        else:
+            time2 = 'NOTIME2'
+    else:
+        time1, time2 = 'NOTIMES'
    
     # Parent Series
     # this structure lets us test if something exists before using it, otherwise error
@@ -127,14 +138,15 @@ for nid in tqdm(test_nids):
 
     # Put it all into output.csv
     # go through multiple showtimes of a single screening
+    j = 0 #track the iteration
     for date in dates:
         
         # Write main screening info    
         f.write(date.string)
         f.write(' | ')   
-        f.write('showtime one')
+        f.write(time1)
         f.write(' | ') 
-        f.write('showtime two')
+        f.write(time2)
         f.write(' | ')   
         f.write(series)
         f.write(' | ') 
@@ -174,19 +186,17 @@ for nid in tqdm(test_nids):
         f.write(' | ') 
         f.write(location)                                         
         f.write('\n')
-
         # Check for program of shorts
+        # if they exist then we do a new row with short film info for what exists
+        # and the general screening info for the rest
         if(soup.select('.block-views-multiple-films-block > h5')):
-            print('yes')
             shorts = soup.select('.block-views-multiple-films-block > section')
-            for short in shorts:
-                  
-                # Write main screening info    
+            for short in shorts:  
                 f.write(date.string)
                 f.write(' | ')   
-                f.write('showtime one')
+                f.write(time1)
                 f.write(' | ') 
-                f.write('showtime two')
+                f.write(time2)
                 f.write(' | ')   
                 f.write(series)
                 f.write(' | ') 
@@ -225,6 +235,5 @@ for nid in tqdm(test_nids):
                 f.write(guests)    
                 f.write(' | ') 
                 f.write(location)                                                                                                                                                                  
-                f.write('\n')                
-        else:
-            print('no')         
+                f.write('\n')   
+        j = j + 1
